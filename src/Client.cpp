@@ -6,17 +6,15 @@ using namespace std;
 rkb::Client::Client(string uri, string token): _uri(move(uri)), _token(move(token)) {
     _client.set_open_listener([this]() {
         _mtx.lock();
+        cout << "connected to " << _uri << endl;
         _cond.notify_all();
         _mtx.unlock();
     });
+    _client.set_close_listener([this](sio::client::close_reason reason){
+        cout << "disconnected from " << _uri << ", reason: " << reason << endl;
+    });
     _client.set_fail_listener([this]() {
         cout << "error" << endl;
-    });
-    _client.socket()->on("key", [this](const sio::event &ev){
-        const auto &msg = ev.get_message();
-        const auto c = msg->get_int();
-        //FIXME
-        cout << "received char: " << char(c) << endl;
     });
 }
 
@@ -38,7 +36,15 @@ void rkb::Client::disconnect() {
     _client.socket()->close();
 }
 
-void rkb::Client::send(string c) {
-    _client.socket()->emit("key", c);
-//    cout << "sending " << c << endl;
+void rkb::Client::send(int64_t key) {
+    auto msg = sio::int_message::create(key);
+    _client.socket()->emit("key", msg);
+}
+
+void rkb::Client::onMessage(const f_msg& callback) {
+    _client.socket()->on("key", [callback](const sio::event &ev){
+        const auto &msg = ev.get_message();
+        const auto c = msg->get_int();
+        callback(c);
+    });
 }

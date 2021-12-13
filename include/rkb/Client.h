@@ -6,6 +6,8 @@
 #include <sio/sio_client.h>
 
 namespace rkb {
+    typedef std::function<void(int64_t)> f_msg;
+
     class Client {
     private:
         sio::client _client;
@@ -17,6 +19,7 @@ namespace rkb {
         explicit Client(std::string uri, std::string token);
         void connect();
         void disconnect();
-        void send(std::string c);
+        void send(int64_t c);
+        void onMessage(const f_msg& callback);
     };
 }

@@ -4,23 +4,37 @@
 
 using namespace std;
 
-int main() {
-    auto client = rkb::Client("ws://localhost:3000", "");
-    client.connect();
-    bool terminate = false;
-    char chr[1];
-
-    printf("Press keys to send\n");
-    while (!terminate) {
-        //
-        char c = _getch();
-        if (c == '\n') {
-            terminate = true;
-        } else {
-            client.send(string(1, c));
-        }
+int main(int argc, char *argv[]) {
+    if (argc == 1) {
+        return -1;
     }
-
-    client.disconnect();
+    auto mode = string(argv[1]);
+    if (mode == "send") {
+        auto client = rkb::Client("ws://localhost:3000", "");
+        client.connect();
+        bool terminate = false;
+        printf("Press keys to send\n");
+        while (!terminate) {
+            // read single character before enter, replace with keystroke WIN32
+            int c = _getch();
+            if (c == '\n') {
+                terminate = true;
+            } else {
+                client.send(c);
+            }
+        }
+        client.disconnect();
+    } else if (mode == "receive") {
+        auto client = rkb::Client("ws://localhost:3000", "");
+        client.onMessage([](const int64_t c) {
+            // todo simulate keystrokes
+            cout << c << endl;
+        });
+        client.connect();
+        cin.ignore();
+        client.disconnect();
+    } else {
+        return -1;
+    }
     return 0;
 }
