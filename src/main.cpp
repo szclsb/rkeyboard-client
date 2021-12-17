@@ -38,6 +38,11 @@ int WINAPI main(int argc, char *argv[]) {
 //        return -1;
 //    }
 
-    auto keyboard = rkb::Keyboard();
+    rkb::Keyboard::detect([](int64_t key, rkb::Keyboard::State state) {
+        cout << key << endl;
+    });
+
+//    rkb::Keyboard::press_key(91);
+
     return 0;
 }
