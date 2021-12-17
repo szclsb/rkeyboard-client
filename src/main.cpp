@@ -38,11 +38,13 @@ int WINAPI main(int argc, char *argv[]) {
 //        return -1;
 //    }
 
-    rkb::Keyboard::detect([](int64_t key, rkb::Keyboard::State state) {
+    auto keyboard = make_shared<rkb::Keyboard>();
+    keyboard->addKeyDownListener("print", [](auto key) {
         cout << key << endl;
     });
+    rkb::Keyboard::scan(keyboard);
 
-//    rkb::Keyboard::press_key(91);
+//    rkb::press_key(91);
 
     return 0;
 }
