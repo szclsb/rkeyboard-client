@@ -3,7 +3,9 @@ project(rkb)
 
 set(CMAKE_CXX_STANDARD 20)
 
-# main module first
+# dependencies first
+add_subdirectory(vendors)
+# main project
 add_subdirectory(src)
 
 # test module second
