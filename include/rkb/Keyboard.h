@@ -1,5 +1,6 @@
 #pragma once
 
+#include "State.h"
 #include <Windows.h>
 #include <functional>
 #include <map>
@@ -17,14 +18,11 @@ namespace rkb {
         std::map<std::string, KeyListener> _keyUpListeners;
     public:
         static void scan(const std::shared_ptr<Keyboard>& keyboard);
-        static void press_key(int64_t key);
-        static void release_key(int64_t key);
+        static void send(const State& state, int64_t key);
 
         bool isPressed(int64_t key);
-        void addKeyDownListener(const std::string& name, const KeyListener& callback);
-        void removeKeyDownListener(const std::string& name);
-        void addKeyUpListener(const std::string& name, const KeyListener& callback);
-        void removeKeyUpListener(const std::string& name);
+        void addKeyListener(const State& state, const std::string& name, const KeyListener& callback);
+        void removeKeyListener(const State& state, const std::string& name);
     };
 
 }

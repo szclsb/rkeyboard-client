@@ -1,10 +1,11 @@
 set(HEADER_FILES
-        #../include/rkb/Client.h
+        ../include/rkb/State.h
+        ../include/rkb/Client.h
         ../include/rkb/Keyboard.h)
 
 set(SOURCE_FILES
         main.cpp
-        #Client.cpp
+        Client.cpp
         Keyboard.cpp)
 
 link_directories(../lib)
