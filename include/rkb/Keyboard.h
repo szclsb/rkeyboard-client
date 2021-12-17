@@ -18,6 +18,7 @@ namespace rkb {
     public:
         static void scan(const std::shared_ptr<Keyboard>& keyboard);
         static void press_key(int64_t key);
+        static void release_key(int64_t key);
 
         bool isPressed(int64_t key);
         void addKeyDownListener(const std::string& name, const KeyListener& callback);

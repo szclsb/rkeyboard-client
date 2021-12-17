@@ -42,13 +42,19 @@ void rkb::Keyboard::scan(const shared_ptr<rkb::Keyboard>& keyboardPtr) {
 }
 
 void rkb::Keyboard::press_key(int64_t key) {
-    INPUT inputs[2] = {};
+    INPUT inputs[1] = {};
     ZeroMemory(inputs, sizeof(inputs));
     inputs[0].type = INPUT_KEYBOARD;
     inputs[0].ki.wVk = key;
-    inputs[1].type = INPUT_KEYBOARD;
-    inputs[1].ki.wVk = key;
-    inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
+    SendInput(ARRAYSIZE(inputs), inputs, sizeof(INPUT));
+}
+
+void rkb::Keyboard::release_key(int64_t key) {
+    INPUT inputs[1] = {};
+    ZeroMemory(inputs, sizeof(inputs));
+    inputs[0].type = INPUT_KEYBOARD;
+    inputs[0].ki.wVk = key;
+    inputs[0].ki.dwFlags = KEYEVENTF_KEYUP;
     SendInput(ARRAYSIZE(inputs), inputs, sizeof(INPUT));
 }
 
