@@ -1,5 +1,5 @@
 set(HEADER_FILES
-        ../include/rkb/State.h
+        ../include/rkb/common.h
         ../include/rkb/Client.h
         ../include/rkb/Keyboard.h)
 

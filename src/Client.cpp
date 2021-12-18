@@ -36,20 +36,15 @@ void rkb::Client::disconnect() {
     _client.socket()->close();
 }
 
-void rkb::Client::send(const State& state, int64_t key) {
+void rkb::Client::send(const string& event, int64_t key) {
     auto msg = sio::int_message::create(key);
-    _client.socket()->emit(state == DOWN ? "keyDown" : "keyUp", msg);
+    _client.socket()->emit(event, msg);
 }
 
-void rkb::Client::onMessage(const f_msg& callback) {
-    _client.socket()->on("keyDown", [callback](const sio::event &ev){
+void rkb::Client::onMessage(const string& event, const KeyListener& listener) {
+    _client.socket()->on(event, [listener](const sio::event &ev){
         const auto &msg = ev.get_message();
         const auto key = msg->get_int();
-        callback(DOWN, key);
-    });
-    _client.socket()->on("keyUp", [callback](const sio::event &ev){
-        const auto &msg = ev.get_message();
-        const auto key = msg->get_int();
-        callback(UP, key);
+        listener(key);
     });
 }

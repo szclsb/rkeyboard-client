@@ -1,15 +1,12 @@
 #pragma once
 
-#include "State.h"
+#include "common.h"
 #include <string>
 #include <mutex>
 #include <condition_variable>
-#include <functional>
 #include <sio_client.h>
 
 namespace rkb {
-    typedef std::function<void(State, int64_t)> f_msg;
-
     class Client {
     private:
         sio::client _client;
@@ -21,7 +18,7 @@ namespace rkb {
         explicit Client(std::string uri, std::string token);
         void connect();
         void disconnect();
-        void send(const State& state, int64_t key);
-        void onMessage(const f_msg& callback);
+        void send(const std::string& event, int64_t key);
+        void onMessage(const std::string& event, const KeyListener& listener);
     };
 }
