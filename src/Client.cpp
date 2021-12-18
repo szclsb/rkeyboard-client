@@ -1,20 +1,21 @@
 #include <rkb/Client.h>
 #include <iostream>
+#include <utility>
 
 using namespace std;
 
-rkb::Client::Client(string uri, string token): _uri(move(uri)), _token(move(token)) {
+rkb::Client::Client(string uri, string  token): _uri(move(uri)), _token(move(token)) {
     _client.set_open_listener([this]() {
         _mtx.lock();
         cout << "connected to " << _uri << endl;
         _cond.notify_all();
         _mtx.unlock();
     });
-    _client.set_close_listener([this](sio::client::close_reason reason){
+    _client.set_close_listener([this](sio::client::close_reason reason) {
         cout << "disconnected from " << _uri << ", reason: " << reason << endl;
     });
     _client.set_fail_listener([this]() {
-        cout << "error" << endl;
+        cerr << "error" << endl;
     });
 }
 
@@ -33,7 +34,7 @@ void rkb::Client::connect() {
 }
 
 void rkb::Client::disconnect() {
-    _client.socket()->close();
+    _client.sync_close();
 }
 
 void rkb::Client::send(const string& event, int64_t key) {

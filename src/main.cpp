@@ -2,9 +2,11 @@
 #include <rkb/Keyboard.h>
 #include <iostream>
 
-#define error_msg "invalid program arguments. Expected: send|receive <host> <port>"
-#define keyDownEvent "keyDown"
-#define keyUpEvent "keyUp"
+#define error_msg "invalid program arguments. Expected > send|receive <host> <port>"
+#define key_down_event "keyDown"
+#define key_up_event "keyUp"
+#define mode_send "send"
+#define mode_receive "receive"
 
 using namespace std;
 
@@ -18,33 +20,33 @@ int WINAPI main(int argc, char *argv[]) {
     int port;
     sscanf_s(argv[3], "%d", &port);
     auto keyboard = make_shared<rkb::Keyboard>();
+    cout << "press LSHIFT + ESC to quit" << endl;
     stringstream ss;
     ss << "ws://" << host << ":" << port;
     auto client = rkb::Client(ss.str(), "");
-    if (mode == "send") {
-        keyboard->addKeyListener(rkb::DOWN, keyDownEvent, [&client](const auto key) {
-            client.send(keyDownEvent, key);
+    if (mode == mode_send) {
+        keyboard->addKeyListener(rkb::DOWN, key_down_event, [&client](const auto key) {
+            client.send(key_down_event, key);
         });
-        keyboard->addKeyListener(rkb::UP, keyUpEvent, [&client](const auto key) {
-            client.send(keyUpEvent, key);
+        keyboard->addKeyListener(rkb::UP, key_up_event, [&client](const auto key) {
+            client.send(key_up_event, key);
         });
-        client.connect();
-        rkb::Keyboard::scan(keyboard);
-        client.disconnect();
-    } else if (mode == "receive") {
-        client.onMessage(keyDownEvent, [](const auto key) {
+    } else if (mode == mode_receive) {
+        client.onMessage(key_down_event, [](const auto key) {
             rkb::Keyboard::send(rkb::DOWN, key);
         });
-        client.onMessage(keyUpEvent, [](const auto key) {
+        client.onMessage(key_up_event, [](const auto key) {
             rkb::Keyboard::send(rkb::UP, key);
         });
-        client.connect();
-        rkb::Keyboard::scan(keyboard);
-        client.disconnect();
     } else {
         cerr << error_msg;
         return -1;
     }
+
+    client.connect();
+    cout << "ready to " << mode << " keystrokes " << (mode == mode_send ? "to" : "from") << " connected devices" << endl;
+    rkb::Keyboard::scan(keyboard);
+    client.disconnect();
 
     return 0;
 }

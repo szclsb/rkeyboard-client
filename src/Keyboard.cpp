@@ -3,26 +3,27 @@
 #include <utility>
 #include <winuser.rh>
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
-static rkb::Keyboard __keyboard;
+rkb::Keyboard __keyboard;
 
 LRESULT CALLBACK rkb::Keyboard::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (lParam != NULL) {
         auto key = ((LPKBDLLHOOKSTRUCT) lParam)->vkCode;
         if (wParam == WM_KEYDOWN) {
-            if (key == VK_ESCAPE) {
+            if (key == VK_ESCAPE && __keyboard._pressed.contains(VK_LSHIFT)) {
                 PostQuitMessage(0);
             } else if (!__keyboard._pressed.contains(key)) {
                 __keyboard._pressed.insert(key);
-                for (const auto& [_, listener]: __keyboard._keyDownListeners) {
+                for (const auto&[_, listener]: __keyboard._keyDownListeners) {
                     listener(key);
                 }
             }
         } else if (wParam == WM_KEYUP) {
             __keyboard._pressed.erase(key);
-            for (const auto& [_, listener]: __keyboard._keyUpListeners) {
+            for (const auto&[_, listener]: __keyboard._keyUpListeners) {
                 listener(key);
             }
         }
@@ -30,7 +31,7 @@ LRESULT CALLBACK rkb::Keyboard::LowLevelKeyboardProc(int nCode, WPARAM wParam, L
     return CallNextHookEx(nullptr, nCode, wParam, lParam);
 }
 
-void rkb::Keyboard::scan(const shared_ptr<rkb::Keyboard>& keyboardPtr) {
+void rkb::Keyboard::scan(const shared_ptr<rkb::Keyboard> &keyboardPtr) {
     if (keyboardPtr == nullptr) {
         exit(-1);
     }
@@ -41,7 +42,7 @@ void rkb::Keyboard::scan(const shared_ptr<rkb::Keyboard>& keyboardPtr) {
     UnhookWindowsHookEx(hook);
 }
 
-void rkb::Keyboard::send(const rkb::KeyState& state, int64_t key) {
+void rkb::Keyboard::send(const rkb::KeyState &state, int64_t key) {
     INPUT inputs[1] = {};
     ZeroMemory(inputs, sizeof(inputs));
     inputs[0].type = INPUT_KEYBOARD;
@@ -52,19 +53,19 @@ void rkb::Keyboard::send(const rkb::KeyState& state, int64_t key) {
     SendInput(ARRAYSIZE(inputs), inputs, sizeof(INPUT));
 }
 
-bool rkb::Keyboard::isPressed(int64_t key) {
+bool rkb::Keyboard::isPressed(const int64_t key) {
     return _pressed.contains(key);
 }
 
-void rkb::Keyboard::addKeyListener(const rkb::KeyState& state, const string& name, const rkb::KeyListener& callback) {
+void rkb::Keyboard::addKeyListener(const rkb::KeyState &state, const string &name, const rkb::KeyListener &callback) {
     if (state == DOWN) {
-        _keyDownListeners.insert(pair<string , rkb::KeyListener>(name, callback));
+        _keyDownListeners.insert(pair<string, rkb::KeyListener>(name, callback));
     } else if (state == UP) {
-        _keyUpListeners.insert(pair<string , rkb::KeyListener>(name, callback));
+        _keyUpListeners.insert(pair<string, rkb::KeyListener>(name, callback));
     }
 }
 
-void rkb::Keyboard::removeKeyListener(const rkb::KeyState& state, const string& name) {
+void rkb::Keyboard::removeKeyListener(const rkb::KeyState &state, const string &name) {
     if (state == DOWN) {
         _keyDownListeners.erase(name);
     } else if (state == UP) {

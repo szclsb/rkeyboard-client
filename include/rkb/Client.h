@@ -9,13 +9,15 @@
 namespace rkb {
     class Client {
     private:
+        Client(auto &uri, auto &token);
+
         sio::client _client;
         std::mutex _mtx;
         std::condition_variable_any _cond;
         std::string _uri;
         std::string _token;
     public:
-        explicit Client(std::string uri, std::string token);
+        explicit Client(std::string  uri, std::string  token);
         void connect();
         void disconnect();
         void send(const std::string& event, int64_t key);
