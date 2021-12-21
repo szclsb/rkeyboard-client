@@ -10,9 +10,10 @@ using namespace std;
 rkb::Keyboard __keyboard;
 
 LRESULT CALLBACK rkb::Keyboard::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
-    if (lParam != NULL) {
+    if (nCode >= 0 && lParam != NULL) {
         auto key = ((LPKBDLLHOOKSTRUCT) lParam)->vkCode;
-        if (wParam == WM_KEYDOWN) {
+        // intercepts system key, so ALT+TAB and other system shortcuts won't work
+        if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
             if (key == VK_ESCAPE && __keyboard._pressed.contains(VK_LSHIFT)) {
                 PostQuitMessage(0);
             } else if (!__keyboard._pressed.contains(key)) {
@@ -21,12 +22,13 @@ LRESULT CALLBACK rkb::Keyboard::LowLevelKeyboardProc(int nCode, WPARAM wParam, L
                     listener(key);
                 }
             }
-        } else if (wParam == WM_KEYUP) {
+        } else if (wParam == WM_KEYUP || wParam == WM_SYSKEYUP) {
             __keyboard._pressed.erase(key);
             for (const auto&[_, listener]: __keyboard._keyUpListeners) {
                 listener(key);
             }
         }
+        return LRESULT(1);
     }
     return CallNextHookEx(nullptr, nCode, wParam, lParam);
 }
