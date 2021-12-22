@@ -14,7 +14,7 @@ namespace rkb {
         std::map<std::string, KeyListener> _keyDownListeners;
         std::map<std::string, KeyListener> _keyUpListeners;
     public:
-        static void scan(const std::shared_ptr<Keyboard>& keyboard);
+        static void scan(const std::string& mode, const std::shared_ptr<Keyboard>& keyboard);
         static void send(const KeyState& state, int64_t key);
 
         bool isPressed(int64_t keys);

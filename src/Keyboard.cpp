@@ -3,11 +3,11 @@
 #include <utility>
 #include <winuser.rh>
 #include <iostream>
-#include <algorithm>
 
 using namespace std;
 
 rkb::Keyboard __keyboard;
+bool __next;
 
 LRESULT CALLBACK rkb::Keyboard::LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (nCode >= 0 && lParam != NULL) {
@@ -28,17 +28,18 @@ LRESULT CALLBACK rkb::Keyboard::LowLevelKeyboardProc(int nCode, WPARAM wParam, L
                 listener(key);
             }
         }
-        return LRESULT(1);
+        return __next ? CallNextHookEx(nullptr, nCode, wParam, lParam) : LRESULT(1);
     }
     return CallNextHookEx(nullptr, nCode, wParam, lParam);
 }
 
-void rkb::Keyboard::scan(const shared_ptr<rkb::Keyboard> &keyboardPtr) {
+void rkb::Keyboard::scan(const string& mode, const shared_ptr<rkb::Keyboard> &keyboardPtr) {
     if (keyboardPtr == nullptr) {
         exit(-1);
     }
     __keyboard = *keyboardPtr;
-    auto hook = SetWindowsHookExW(WH_KEYBOARD_LL, rkb::Keyboard::LowLevelKeyboardProc, nullptr, 0);
+    __next = (mode == mode_receive);
+    auto hook = SetWindowsHookExW(WH_KEYBOARD_LL, LowLevelKeyboardProc, nullptr, 0);
     MSG msg;
     while (GetMessage(&msg, nullptr, 0, 0)) {}
     UnhookWindowsHookEx(hook);

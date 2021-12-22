@@ -1,12 +1,9 @@
+#include <rkb/common.h>
 #include <rkb/Client.h>
 #include <rkb/Keyboard.h>
 #include <iostream>
 
 #define error_msg "invalid program arguments. Expected > send|receive <host> <port>"
-#define key_down_event "keyDown"
-#define key_up_event "keyUp"
-#define mode_send "send"
-#define mode_receive "receive"
 
 using namespace std;
 
@@ -45,7 +42,7 @@ int WINAPI main(int argc, char *argv[]) {
 
     client.connect();
     cout << "ready to " << mode << " keystrokes " << (mode == mode_send ? "to" : "from") << " connected devices" << endl;
-    rkb::Keyboard::scan(keyboard);
+    rkb::Keyboard::scan(mode, keyboard);
     client.disconnect();
 
     return 0;
