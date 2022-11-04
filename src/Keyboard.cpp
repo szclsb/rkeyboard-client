@@ -16,7 +16,7 @@ LRESULT CALLBACK rkb::Keyboard::LowLevelKeyboardProc(int nCode, WPARAM wParam, L
         if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
             if (key == VK_ESCAPE && __keyboard._pressed.contains(VK_LSHIFT)) {
                 PostQuitMessage(0);
-            } else if (!__keyboard._pressed.contains(key)) {
+            } else {
                 __keyboard._pressed.insert(key);
                 for (const auto&[_, listener]: __keyboard._keyDownListeners) {
                     listener(key);

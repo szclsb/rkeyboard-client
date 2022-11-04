@@ -2,6 +2,7 @@
 #include <rkb/Client.h>
 #include <rkb/Keyboard.h>
 #include <iostream>
+#include <sstream>
 
 #define error_msg "invalid program arguments. Expected > send|receive <host> <port>"
 
