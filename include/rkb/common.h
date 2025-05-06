@@ -1,6 +1,10 @@
 #pragma once
 
+#include <memory>
 #include <functional>
+#include <string>
+#include <map>
+#include <set>
 
 #define key_down_event "keyDown"
 #define key_up_event "keyUp"

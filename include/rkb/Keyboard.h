@@ -2,8 +2,6 @@
 
 #include "common.h"
 #include <Windows.h>
-#include <map>
-#include <set>
 
 namespace rkb {
     class Keyboard {

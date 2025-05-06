@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.h"
-#include <string>
 #include <mutex>
 #include <condition_variable>
 #include <sio_client.h>
